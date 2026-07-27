@@ -19,7 +19,11 @@ export default function LoginPage() {
     const result = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
     if (result?.error) setError("That email or password is not correct.");
-    else { router.push("/account/orders"); router.refresh(); }
+    else {
+      const session = await fetch("/api/auth/session").then((response) => response.json());
+      router.push(session?.user?.role === "ADMIN" ? "/admin" : "/account");
+      router.refresh();
+    }
   }
 
   return (

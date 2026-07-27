@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatGHS } from "@/lib/money";
 import QuickAddButton from "./QuickAddButton";
+import WishlistButton from "./WishlistButton";
 
 type Props = {
   product: {
@@ -26,7 +27,7 @@ export default function ProductCard({ product }: Props) {
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#F4F5F7]">
           {discount && <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-brand-red px-2 py-1.5 text-[10px] font-bold text-white sm:left-3 sm:top-3">{discount}% off</span>}
-          <span className="absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-lg text-slate-600 shadow-sm">♡</span>
+          <WishlistButton productId={product.id} />
           {product.images[0] && <Image src={product.images[0]} alt={product.name} fill className="object-cover transition duration-500 group-hover:scale-105" />}
         </div>
         <div className="py-3">

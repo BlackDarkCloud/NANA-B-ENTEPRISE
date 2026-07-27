@@ -10,7 +10,7 @@ export default function BottomNav() {
   const tabs = [
     { href: "/", label: "Shop", icon: "⌂" },
     { href: "/search", label: "Search", icon: "⌕" },
-    { href: session?.user ? "/account/orders" : "/login", label: session?.user ? "Account" : "Sign in", icon: "♡" },
+    { href: session?.user ? ((session.user as any)?.role === "ADMIN" ? "/admin" : "/account") : "/login", label: session?.user ? ((session.user as any)?.role === "ADMIN" ? "Admin" : "Account") : "Sign in", icon: "♡" },
     { href: "/cart", label: "Cart", icon: "▱" },
   ];
 

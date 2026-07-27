@@ -53,7 +53,7 @@ export default function Navbar() {
             <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
               {session?.user ? (
                 <>
-                  <Link onClick={() => setMenuOpen(false)} href="/account/orders" className="flex-1 rounded-xl bg-brand p-3 text-center text-sm font-bold text-white">My account</Link>
+                  <Link onClick={() => setMenuOpen(false)} href={(session.user as any)?.role === "ADMIN" ? "/admin" : "/account"} className="flex-1 rounded-xl bg-brand p-3 text-center text-sm font-bold text-white">{(session.user as any)?.role === "ADMIN" ? "Admin panel" : "My account"}</Link>
                   <button onClick={() => signOut()} className="flex-1 rounded-xl border border-slate-300 p-3 text-sm font-bold">Sign out</button>
                 </>
               ) : (
@@ -78,7 +78,7 @@ export default function Navbar() {
         </form>
         <div className="ml-auto flex items-center gap-4">
           {session?.user ? (
-            <><Link href="/account/orders" className="text-sm font-semibold text-slate-700">My orders</Link><button onClick={() => signOut()} className="text-sm text-slate-500">Sign out</button></>
+            <><Link href={(session.user as any)?.role === "ADMIN" ? "/admin" : "/account"} className="text-sm font-semibold text-slate-700">{(session.user as any)?.role === "ADMIN" ? "Admin panel" : "My account"}</Link><button onClick={() => signOut()} className="text-sm text-slate-500">Sign out</button></>
           ) : (
             <><Link href="/login" className="text-sm font-semibold text-slate-700">Sign in</Link><Link href="/register" className="rounded-full border border-brand px-4 py-2 text-sm font-semibold text-brand">Create account</Link></>
           )}

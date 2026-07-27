@@ -14,7 +14,7 @@ type OrderEmail = {
   city: string;
   total: number;
   status: string;
-  user?: { email: string } | null;
+  user?: { email: string; emailNotifications?: boolean } | null;
   items: Array<{ name: string; quantity: number; price: number }>;
 };
 
@@ -58,7 +58,7 @@ export function emailNotificationsConfigured() {
 }
 
 export function ownerEmailAddress() {
-  return process.env.OWNER_EMAIL || process.env.SEED_ADMIN_EMAIL || "";
+  return process.env.OWNER_EMAIL || "nanabooakye1@gmail.com";
 }
 
 export async function sendEmail(message: EmailMessage) {
@@ -114,6 +114,7 @@ export async function notifyOwnerOfOrder(order: OrderEmail) {
 
 export async function notifyCustomerOfStatus(order: OrderEmail) {
   if (!order.user?.email) return { sent: false, reason: "Customer email is unavailable" };
+  if (order.user.emailNotifications === false) return { sent: false, reason: "Customer disabled order emails" };
 
   return sendEmail({
     to: order.user.email,
