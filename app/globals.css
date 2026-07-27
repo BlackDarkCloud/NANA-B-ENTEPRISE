@@ -3,5 +3,37 @@
 @tailwind utilities;
 
 body {
-  @apply text-ink bg-white;
+  @apply bg-[#F7F8FB] text-ink;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  @apply bg-brand text-white;
+}
+
+@layer components {
+  .site-shell {
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8;
+  }
+  .eyebrow {
+    @apply inline-flex text-[11px] font-extrabold uppercase tracking-[.2em] text-brand-red;
+  }
+  .section-title {
+    @apply text-2xl font-black tracking-[-.03em] text-brand-dark sm:text-3xl;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-brand px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand/20 transition hover:-translate-y-0.5 hover:bg-brand-dark;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-brand-dark transition hover:border-brand hover:text-brand;
+  }
+  .category-card {
+    @apply rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-lg;
+  }
+  .form-input {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-4 focus:ring-brand/10;
+  }
 }

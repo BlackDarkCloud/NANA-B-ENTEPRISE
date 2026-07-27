@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 type Zone = { id: string; name: string; price: number; estimatedDays: string };
 
 export default function CheckoutPage() {
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal, clearCart, hydrated } = useCart();
   const router = useRouter();
   const [zones, setZones] = useState<Zone[]>([]);
   const [zoneId, setZoneId] = useState("");
@@ -20,27 +20,29 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/delivery-zones")
-      .then((r) => r.json())
-      .then((data) => {
-        setZones(data);
-        if (data[0]) setZoneId(data[0].id);
-      });
+    fetch("/api/delivery-zones").then((response) => response.json()).then((data) => {
+      setZones(data);
+      if (data[0]) setZoneId(data[0].id);
+    });
   }, []);
 
-  const deliveryFee = zones.find((z) => z.id === zoneId)?.price || 0;
+  useEffect(() => {
+    if (hydrated && items.length === 0) router.replace("/cart");
+  }, [hydrated, items.length, router]);
+
+  const deliveryFee = zones.find((zone) => zone.id === zoneId)?.price || 0;
   const total = subtotal + deliveryFee - discount;
 
   async function applyCoupon() {
     setCouponMsg("");
     if (!couponCode) return;
-    const res = await fetch("/api/coupons/validate", {
+    const response = await fetch("/api/coupons/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: couponCode, subtotal }),
     });
-    const data = await res.json();
-    if (!res.ok) {
+    const data = await response.json();
+    if (!response.ok) {
       setDiscount(0);
       setCouponMsg(data.error || "Invalid coupon");
     } else {
@@ -49,99 +51,66 @@ export default function CheckoutPage() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/checkout", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items,
-          zoneId,
-          couponCode: discount > 0 ? couponCode : undefined,
-          ...form,
-        }),
+        body: JSON.stringify({ items, zoneId, couponCode: discount > 0 ? couponCode : undefined, ...form }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Checkout failed");
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Checkout failed");
       clearCart();
-      window.location.href = data.authorization_url; // redirect to Paystack
-    } catch (err: any) {
-      setError(err.message);
+      window.location.href = data.authorization_url;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Checkout failed");
       setLoading(false);
     }
   }
 
-  if (items.length === 0) {
-    router.push("/cart");
-    return null;
-  }
+  if (!hydrated || items.length === 0) return null;
 
   return (
-    <form onSubmit={handleSubmit} className="px-4 py-4 space-y-4">
-      <h1 className="font-semibold text-lg">Checkout</h1>
+    <form onSubmit={handleSubmit} className="site-shell max-w-3xl space-y-6 py-10">
+      <div><span className="eyebrow">Secure payment</span><h1 className="section-title mt-2">Checkout</h1></div>
 
-      <div className="space-y-3">
-        <input required placeholder="Full Name" className="w-full border rounded-lg p-3"
-          value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} />
-        <input required type="email" placeholder="Email" className="w-full border rounded-lg p-3"
-          value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input required placeholder="Phone Number" className="w-full border rounded-lg p-3"
-          value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        <input required placeholder="Delivery Address" className="w-full border rounded-lg p-3"
-          value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-        <input required placeholder="City / Town" className="w-full border rounded-lg p-3"
-          value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-        <textarea placeholder="Order notes (optional)" className="w-full border rounded-lg p-3"
-          value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+      <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2">
+        <input required placeholder="Full name" className="form-input" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} />
+        <input required type="email" placeholder="Email address" className="form-input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <input required placeholder="Phone number" className="form-input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        <input required placeholder="Delivery address" className="form-input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+        <input required placeholder="City / town" className="form-input" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+        <textarea placeholder="Order notes (optional)" className="form-input" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
       </div>
 
-      <div>
-        <label className="text-sm font-medium">Delivery Zone</label>
-        <select
-          className="w-full border rounded-lg p-3 mt-1"
-          value={zoneId}
-          onChange={(e) => setZoneId(e.target.value)}
-        >
-          {zones.map((z) => (
-            <option key={z.id} value={z.id}>
-              {z.name} — {formatGHS(z.price)} ({z.estimatedDays})
-            </option>
-          ))}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <label className="text-sm font-bold text-brand-dark">Delivery zone</label>
+        <select className="form-input mt-2" value={zoneId} onChange={(e) => setZoneId(e.target.value)}>
+          {zones.map((zone) => <option key={zone.id} value={zone.id}>{zone.name} — {formatGHS(zone.price)} ({zone.estimatedDays})</option>)}
         </select>
       </div>
 
-      <div className="flex gap-2">
-        <input
-          placeholder="Coupon code"
-          className="flex-1 border rounded-lg p-3"
-          value={couponCode}
-          onChange={(e) => setCouponCode(e.target.value)}
-        />
-        <button type="button" onClick={applyCoupon} className="border border-brand text-brand rounded-lg px-4">
-          Apply
-        </button>
+      <div className="flex gap-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <input placeholder="Coupon code" className="form-input flex-1" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
+        <button type="button" onClick={applyCoupon} className="rounded-xl border border-brand px-5 font-bold text-brand">Apply</button>
       </div>
-      {couponMsg && <p className="text-xs text-brand">{couponMsg}</p>}
+      {couponMsg && <p className="text-sm font-semibold text-brand">{couponMsg}</p>}
 
-      <div className="border-t pt-4 space-y-1 text-sm">
-        <div className="flex justify-between"><span>Subtotal</span><span>{formatGHS(subtotal)}</span></div>
-        <div className="flex justify-between"><span>Delivery</span><span>{formatGHS(deliveryFee)}</span></div>
-        {discount > 0 && <div className="flex justify-between text-brand"><span>Discount</span><span>-{formatGHS(discount)}</span></div>}
-        <div className="flex justify-between font-bold text-base pt-2 border-t"><span>Total</span><span>{formatGHS(total)}</span></div>
+      <div className="space-y-2 rounded-2xl bg-brand-dark p-6 text-sm text-white">
+        <div className="flex justify-between"><span className="text-white/70">Subtotal</span><span>{formatGHS(subtotal)}</span></div>
+        <div className="flex justify-between"><span className="text-white/70">Delivery</span><span>{formatGHS(deliveryFee)}</span></div>
+        {discount > 0 && <div className="flex justify-between text-emerald-300"><span>Discount</span><span>-{formatGHS(discount)}</span></div>}
+        <div className="flex justify-between border-t border-white/10 pt-3 text-lg font-bold"><span>Total</span><span>{formatGHS(total)}</span></div>
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-brand text-white rounded-lg py-3 font-semibold disabled:opacity-50"
-      >
-        {loading ? "Redirecting to Paystack..." : "Pay Now"}
+      {error && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      <button type="submit" disabled={loading} className="w-full rounded-xl bg-brand-red py-3.5 font-bold text-white hover:bg-red-700 disabled:opacity-50">
+        {loading ? "Taking you to Paystack..." : `Pay securely • ${formatGHS(total)}`}
       </button>
+      <p className="text-center text-xs text-slate-500">Your payment is processed securely by Paystack. Nana B does not store card details.</p>
     </form>
   );
 }

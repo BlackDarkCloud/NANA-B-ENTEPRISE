@@ -7,7 +7,7 @@ export default async function AdminDashboard() {
   const [productCount, orderCount, pendingCount, revenue] = await Promise.all([
     prisma.product.count(),
     prisma.order.count(),
-    prisma.order.count({ where: { status: "PAID" } }),
+    prisma.order.count({ where: { status: { in: ["PAID", "PROCESSING"] } } }),
     prisma.order.aggregate({
       _sum: { total: true },
       where: { status: { in: ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] } },

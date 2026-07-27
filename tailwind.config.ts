@@ -6,14 +6,15 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#D9531E", // burnt orange, echoes kente/Ghanaian palette
-          dark: "#7A2E0E",
-          light: "#F4A261",
+          DEFAULT: "#123D91",
+          dark: "#08255F",
+          light: "#E9F0FF",
+          red: "#D91E2B",
         },
-        ink: "#241708",
+        ink: "#101828",
       },
       fontFamily: {
-        sans: ["ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["Inter", "Aptos", "Segoe UI", "sans-serif"],
       },
     },
   },

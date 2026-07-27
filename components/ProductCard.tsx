@@ -20,35 +20,22 @@ export default function ProductCard({ product }: Props) {
       : null;
 
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      className="block rounded-xl overflow-hidden border hover:shadow-md transition"
-    >
-      <div className="relative aspect-square bg-gray-50">
+    <Link href={`/products/${product.slug}`} className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-xl">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#F1F3F7]">
         {discount && (
-          <span className="absolute top-2 left-2 bg-brand text-white text-xs font-semibold px-2 py-1 rounded">
-            {discount}% off
-          </span>
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-red px-2.5 py-1 text-[10px] font-bold text-white">{discount}% off</span>
         )}
         {product.images[0] && (
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            fill
-            className="object-cover"
-          />
+          <Image src={product.images[0]} alt={product.name} fill className="object-cover transition duration-500 group-hover:scale-105" />
         )}
       </div>
-      <div className="p-3">
-        <p className="text-sm text-ink line-clamp-2 mb-1">{product.name}</p>
-        <div className="flex items-baseline gap-2">
-          {product.compareAtPrice && (
-            <span className="text-xs text-gray-400 line-through">
-              {formatGHS(product.compareAtPrice)}
-            </span>
-          )}
-          <span className="text-brand font-bold">{formatGHS(product.price)}</span>
+      <div className="p-4">
+        <p className="mb-2 line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-slate-800">{product.name}</p>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <span className="font-extrabold text-brand">{formatGHS(product.price)}</span>
+          {product.compareAtPrice && <span className="text-xs text-slate-400 line-through">{formatGHS(product.compareAtPrice)}</span>}
         </div>
+        <span className="mt-3 block text-xs font-semibold text-slate-500 group-hover:text-brand">View product →</span>
       </div>
     </Link>
   );
