@@ -7,7 +7,9 @@ export default auth((req) => {
   const isAdminRoute = path.startsWith("/admin");
   const role = (req.auth?.user as any)?.role;
 
-  if (!isAdminRoute) return NextResponse.next();
+  if (!isAdminRoute) {
+    return NextResponse.rewrite(new URL("/maintenance", req.url));
+  }
 
   if (isAdminLogin) {
     if (role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
@@ -24,5 +26,7 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|assets|maintenance).*)",
+  ],
 };
