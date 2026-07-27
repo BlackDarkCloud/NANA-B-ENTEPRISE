@@ -27,7 +27,7 @@ export default function Navbar() {
             <small className="text-[9px] font-bold tracking-[.18em] text-brand-red">ENTERPRISES</small>
           </span>
         </Link>
-        <form action="/search" className="relative max-w-2xl flex-1">
+        <form action="/search" className="relative hidden max-w-2xl flex-1 sm:block">
           <input
             name="q"
             placeholder="Search appliances, cookware and more"
@@ -38,6 +38,7 @@ export default function Navbar() {
             Search
           </button>
         </form>
+        <Link href="/search" className="ml-auto rounded-full bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 sm:hidden">Search</Link>
         <div className="hidden items-center gap-4 lg:flex">
           {session?.user ? (
             <>
@@ -51,6 +52,9 @@ export default function Navbar() {
             </>
           )}
         </div>
+        <Link href={session?.user ? "/account/orders" : "/login"} className="rounded-full border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 lg:hidden">
+          {session?.user ? "Account" : "Sign in"}
+        </Link>
         <Link href="/cart" className="relative rounded-full bg-brand-light px-3 py-2 text-sm font-bold text-brand" aria-label={`Cart with ${count} items`}>
           Bag
           {count > 0 && (

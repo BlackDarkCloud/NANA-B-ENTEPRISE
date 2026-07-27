@@ -3,6 +3,7 @@ import { initializeTransaction } from "@/lib/paystack";
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { auth } from "@/lib/auth";
+import { notifyCustomerOfStatus, notifyOwnerOfOrder } from "@/lib/email";
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
       notes,
       items: { create: orderItemsData },
     },
+    include: { items: true, user: true },
   });
 
   try {
@@ -95,6 +97,11 @@ export async function POST(req: Request) {
       callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/order/confirm?ref=${reference}`,
       metadata: { orderId: order.id },
     });
+
+    await Promise.allSettled([
+      notifyOwnerOfOrder(order),
+      notifyCustomerOfStatus(order),
+    ]);
 
     return NextResponse.json({ authorization_url: paystack.authorization_url });
   } catch (err: any) {

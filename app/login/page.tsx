@@ -38,6 +38,9 @@ export default function LoginPage() {
           <button disabled={loading} className="w-full rounded-xl bg-brand py-3.5 font-bold text-white hover:bg-brand-dark disabled:opacity-50">{loading ? "Signing in..." : "Sign in"}</button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-500">New to Nana B? <Link href="/register" className="font-bold text-brand">Create an account</Link></p>
+        <div className="mt-5 border-t border-slate-100 pt-5 text-center">
+          <Link href="/admin/login" className="text-xs font-bold text-slate-500 hover:text-brand">Administrator sign in →</Link>
+        </div>
       </div>
     </div>
   );

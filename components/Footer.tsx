@@ -19,6 +19,7 @@ export default function Footer() {
             <Link href="/category/kitchen-dining" className="block hover:text-white">Kitchen & dining</Link>
             <Link href="/category/lifestyle" className="block hover:text-white">Lifestyle</Link>
             <Link href="/account/orders" className="block hover:text-white">Track my orders</Link>
+            <Link href="/admin/login" className="block hover:text-white">Administrator sign in</Link>
           </div>
         </div>
         <div>

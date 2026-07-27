@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { verifyWebhookSignature, verifyTransaction } from "@/lib/paystack";
 import { NextResponse } from "next/server";
+import { notifyCustomerOfStatus, notifyOwnerOfOrder } from "@/lib/email";
 
 // Paystack webhooks are the source of truth for payment confirmation.
 // Always verify the signature AND re-verify the transaction server-side.
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
 
     const order = await prisma.order.findUnique({
       where: { reference },
-      include: { items: true },
+      include: { items: true, user: true },
     });
 
     if (order && order.status === "PENDING") {
@@ -48,6 +49,12 @@ export async function POST(req: Request) {
               }),
             ]
           : []),
+      ]);
+
+      const paidOrder = { ...order, status: "PAID" };
+      await Promise.allSettled([
+        notifyOwnerOfOrder(paidOrder),
+        notifyCustomerOfStatus(paidOrder),
       ]);
     }
   }
