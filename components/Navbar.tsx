@@ -27,9 +27,8 @@ export default function Navbar() {
             <span className="h-0.5 w-5 bg-current" />
             <span className="h-0.5 w-5 bg-current" />
           </button>
-          <Link href="/" className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2" aria-label="Nana B Enterprises home">
-            <Image src="/assets/nana-b-logo.jpg" alt="" width={38} height={38} className="h-9 w-9 rounded-lg object-cover object-top" />
-            <span className="whitespace-nowrap text-base font-black tracking-tight text-brand-dark">NANA B</span>
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2" aria-label="Nana B Enterprises home">
+            <span className="whitespace-nowrap text-sm font-black tracking-[.08em] text-brand-dark">NANA B ENTERPRISES</span>
           </Link>
           <Link href="/cart" className="relative rounded-full border border-slate-200 px-3 py-2 text-xs font-black text-brand-dark" aria-label={`Shopping bag with ${count} items`}>
             Bag

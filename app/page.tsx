@@ -37,7 +37,7 @@ export default async function HomePage() {
             <span className="eyebrow">Home of quality appliances</span>
             <h1 className="mt-5 max-w-xl text-5xl font-black leading-[1.06] tracking-[-.04em] text-brand-dark lg:text-6xl">Make everyday living feel <span className="text-brand-red">effortless.</span></h1>
             <p className="mt-5 max-w-lg text-lg leading-7 text-slate-600">Shop dependable home, kitchen and lifestyle appliances at honest prices—wholesale or retail, with delivery across Ghana.</p>
-            <div className="mt-8 flex gap-3"><a href="#best-sellers" className="btn-primary">Shop appliances</a><a href="https://wa.me/233505580710" className="btn-secondary">Order on WhatsApp</a></div>
+            <div className="mt-8 flex gap-3"><a href="#best-sellers" className="btn-primary">Shop appliances</a><a href="https://wa.me/233244018530" className="btn-secondary">Order on WhatsApp</a></div>
             <div className="mt-9 flex gap-6 text-xs font-semibold text-slate-600"><span>✓ Secure checkout</span><span>✓ Nationwide delivery</span><span>✓ Friendly support</span></div>
           </div>
           <div className="relative h-[570px] self-end">

@@ -47,7 +47,7 @@ function emailFrame(title: string, content: string) {
         </div>
         <div style="padding:28px">${content}</div>
         <div style="padding:18px 28px;background:#f8fafc;color:#667085;font-size:12px">
-          Need help? Call 0244 018 530 or WhatsApp 0505 580 710.
+          Need help? Call or WhatsApp 0244 018 530.
         </div>
       </div>
     </div>`;

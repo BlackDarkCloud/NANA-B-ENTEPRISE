@@ -26,8 +26,8 @@ export default function Footer() {
           <p className="mb-4 text-sm font-bold uppercase tracking-wider text-white/50">Call or WhatsApp</p>
           <div className="space-y-3 text-sm">
             <a href="tel:+233244018530" className="block font-semibold hover:text-white/70">0244 018 530</a>
-            <a href="https://wa.me/233505580710" className="block font-semibold hover:text-white/70">0505 580 710</a>
-            <a href="https://wa.me/233505580710" className="block text-white/70 hover:text-white">Message us on WhatsApp</a>
+            <a href="https://wa.me/233244018530" className="block font-semibold hover:text-white/70">0244 018 530</a>
+            <a href="https://wa.me/233244018530" className="block text-white/70 hover:text-white">Message us on WhatsApp</a>
           </div>
         </div>
         <div>
