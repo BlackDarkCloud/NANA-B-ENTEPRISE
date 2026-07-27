@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Neon: use a pooled connection for the app, direct for migrations
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      Role     @default(USER)
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id              String      @id @default(cuid())
+  name            String
+  slug            String      @unique
+  description     String
+  price           Int // stored in pesewas (GHS minor unit) to avoid float issues
+  compareAtPrice  Int?
+  images          String[]
+  stock           Int         @default(0)
+  featured        Boolean     @default(false)
+  active          Boolean     @default(true)
+  categoryId      String
+  category        Category    @relation(fields: [categoryId], references: [id])
+  orderItems      OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([categoryId])
+}
+
+model DeliveryZone {
+  id             String  @id @default(cuid())
+  name           String
+  price          Int // pesewas
+  estimatedDays  String
+  active         Boolean @default(true)
+  orders         Order[]
+}
+
+model Coupon {
+  id              String     @id @default(cuid())
+  code            String     @unique
+  type            CouponType
+  value           Int // percentage (0-100) or fixed amount in pesewas
+  minOrderAmount  Int        @default(0)
+  maxUses         Int?
+  usedCount       Int        @default(0)
+  active          Boolean    @default(true)
+  expiresAt       DateTime?
+  orders          Order[]
+  createdAt       DateTime   @default(now())
+}
+
+model Order {
+  id              String       @id @default(cuid())
+  reference       String       @unique // paystack reference
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  subtotal        Int
+  deliveryFee     Int
+  discount        Int          @default(0)
+  total           Int
+  status          OrderStatus  @default(PENDING)
+  deliveryZoneId  String?
+  deliveryZone    DeliveryZone? @relation(fields: [deliveryZoneId], references: [id])
+  couponId        String?
+  coupon          Coupon?      @relation(fields: [couponId], references: [id])
+  fullName        String
+  phone           String
+  address         String
+  city            String
+  notes           String?
+  paidAt          DateTime?
+  createdAt       DateTime     @default(now())
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  price     Int
+  quantity  Int
+}
