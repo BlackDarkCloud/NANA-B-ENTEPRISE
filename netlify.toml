@@ -2,5 +2,10 @@
   command = "prisma generate && next build"
   publish = ".next"
 
+[build.environment]
+  # Paystack's public key is intentionally embedded in the checkout client.
+  # The secret key is used only inside Netlify's protected server functions.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,PAYSTACK_SECRET_KEY"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
