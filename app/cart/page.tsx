@@ -30,7 +30,7 @@ export default function CartPage() {
           {items.map((item) => (
             <div key={item.productId} className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                {item.image && <Image src={item.image} alt={item.name} fill className="object-cover" />}
+                {item.image && <Image src={item.image} alt={item.name} fill unoptimized={item.image.startsWith("data:")} className="object-cover" />}
               </div>
               <div className="flex flex-1 flex-col">
                 <p className="line-clamp-2 font-bold text-brand-dark">{item.name}</p>

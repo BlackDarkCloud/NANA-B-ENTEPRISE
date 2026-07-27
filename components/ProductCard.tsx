@@ -28,7 +28,7 @@ export default function ProductCard({ product }: Props) {
         <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#F4F5F7]">
           {discount && <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-brand-red px-2 py-1.5 text-[10px] font-bold text-white sm:left-3 sm:top-3">{discount}% off</span>}
           <WishlistButton productId={product.id} />
-          {product.images[0] && <Image src={product.images[0]} alt={product.name} fill className="object-cover transition duration-500 group-hover:scale-105" />}
+          {product.images[0] && <Image src={product.images[0]} alt={product.name} fill unoptimized={product.images[0].startsWith("data:")} className="object-cover transition duration-500 group-hover:scale-105" />}
         </div>
         <div className="py-3">
           {product.category?.name && <p className="truncate text-[9px] font-bold uppercase tracking-wide text-slate-400 sm:text-[10px]">{product.category.name}</p>}

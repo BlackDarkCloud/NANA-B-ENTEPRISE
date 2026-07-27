@@ -1,23 +1,40 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-async function requireAdmin() {
+const productSchema = z.object({
+  name: z.string().min(2),
+  slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+  description: z.string().min(10),
+  price: z.number().int().nonnegative(),
+  compareAtPrice: z.number().int().nonnegative().nullable(),
+  images: z.array(z.string().min(1)).min(1).max(4),
+  stock: z.number().int().nonnegative(),
+  categoryId: z.string().min(1),
+  featured: z.boolean(),
+  active: z.boolean(),
+});
+
+async function isAdmin() {
   const session = await auth();
   return (session?.user as any)?.role === "ADMIN";
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  if (!(await requireAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
-  const body = await req.json();
-  const product = await prisma.product.update({ where: { id: params.id }, data: body });
-  return NextResponse.json(product);
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const parsed = productSchema.safeParse(await request.json());
+  if (!parsed.success) return NextResponse.json({ error: "Please check all product details." }, { status: 400 });
+  try {
+    const product = await prisma.product.update({ where: { id: params.id }, data: parsed.data });
+    return NextResponse.json(product);
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.code === "P2002" ? "That product URL name already exists." : "Could not update product." }, { status: 400 });
+  }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  if (!(await requireAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
+export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
+  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   await prisma.product.update({ where: { id: params.id }, data: { active: false } });
   return NextResponse.json({ success: true });
 }

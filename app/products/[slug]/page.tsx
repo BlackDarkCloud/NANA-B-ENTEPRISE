@@ -16,7 +16,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <div className="mb-6 text-xs text-slate-500"><Link href="/" className="hover:text-brand">Home</Link><span className="px-2">/</span>{product.name}</div>
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#EFF2F6]">
-          {product.images[0] && <Image src={product.images[0]} alt={product.name} fill priority className="object-cover" />}
+          {product.images[0] && <Image src={product.images[0]} alt={product.name} fill priority unoptimized={product.images[0].startsWith("data:")} className="object-cover" />}
         </div>
         <div className="self-center">
           <span className="eyebrow">Nana B quality pick</span>
