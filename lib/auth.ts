@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // Netlify forwards the original request host to its serverless runtime.
+  // Auth.js requires this host to be explicitly trusted outside Vercel.
+  trustHost: true,
+  secret: process.env.AUTH_SECRET,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
