@@ -3,11 +3,19 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
+// AUTH_SECRET is preferred. NEXTAUTH_SECRET supports older Netlify setups.
+// DATABASE_URL is already a protected, stable server-only value and keeps
+// existing deployments usable until a dedicated auth secret is configured.
+const authSecret =
+  process.env.AUTH_SECRET ??
+  process.env.NEXTAUTH_SECRET ??
+  process.env.DATABASE_URL;
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // Netlify forwards the original request host to its serverless runtime.
   // Auth.js requires this host to be explicitly trusted outside Vercel.
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: authSecret,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
