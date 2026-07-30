@@ -81,9 +81,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     },
     areaServed: { "@type": "Country", name: "Ghana" },
     sameAs: [
-      "https://www.instagram.com/NaNa_B_Enterprises",
-      "https://www.facebook.com/NaNaBEnterprises",
-      "https://www.tiktok.com/@NaNaBEnterprises",
+      "https://www.instagram.com/nana_b_enterprises/",
+      "https://www.facebook.com/share/1GC8MPxyDJ/",
     ],
   };
 

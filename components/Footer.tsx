@@ -33,8 +33,11 @@ export default function Footer() {
         <div>
           <p className="mb-4 text-sm font-bold uppercase tracking-wider text-white/50">Visit our shop</p>
           <p className="text-sm leading-6 text-white/75">Makola Shopping Mall, opposite Georgina Stores, Angelina House, 1st Floor, Shop 31.</p>
-          <p className="mt-4 text-xs font-semibold text-white">@NaNa_B_Enterprises</p>
-          <p className="mt-2 text-xs text-white/60">Instagram • Facebook • TikTok • X • Snapchat</p>
+          <p className="mt-5 text-sm font-bold text-white">Follow Nana B Enterprises</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a href="https://www.instagram.com/nana_b_enterprises?igsh=YWFuejd3ZXY3dXFq&utm_source=qr" target="_blank" rel="noopener noreferrer" className="rounded-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] px-4 py-2 text-xs font-bold text-white transition hover:-translate-y-0.5">Instagram</a>
+            <a href="https://www.facebook.com/share/1GC8MPxyDJ/" target="_blank" rel="noopener noreferrer" className="rounded-full bg-[#1877F2] px-4 py-2 text-xs font-bold text-white transition hover:-translate-y-0.5">Facebook</a>
+          </div>
         </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-white/50">© {new Date().getFullYear()} Nana B Enterprises. Home of quality and professional appliances.</div>
