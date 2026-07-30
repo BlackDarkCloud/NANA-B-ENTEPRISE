@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     "Shop TVs, fridges, washing machines, cookers, blenders, fans and quality home appliances from Nana B Enterprises in Makola, Accra. Wholesale, retail and delivery across Ghana.",
   keywords: [
     "Nana B Enterprises",
+    "Nana B Enterprise",
+    "Nana B Enterprise Ghana",
+    "Nana B appliances",
     "home appliances Ghana",
     "appliance shop Accra",
     "electronics Makola",
@@ -65,24 +68,49 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const storeSchema = {
+  const searchSchema = {
     "@context": "https://schema.org",
-    "@type": ["Store", "HomeGoodsStore"],
-    name: "Nana B Enterprises",
-    description: "Wholesale and retail home, kitchen and lifestyle appliances in Accra, Ghana.",
-    image: `${siteUrl}/assets/appliance-showroom.png`,
-    telephone: "+233244018530",
-    priceRange: "GH₵",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Makola Shopping Mall, opposite Georgina Stores, Angelina House, 1st Floor, Shop 31",
-      addressLocality: "Accra",
-      addressCountry: "GH",
-    },
-    areaServed: { "@type": "Country", name: "Ghana" },
-    sameAs: [
-      "https://www.instagram.com/nana_b_enterprises/",
-      "https://www.facebook.com/share/1GC8MPxyDJ/",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        url: siteUrl,
+        name: "Nana B Enterprises",
+        alternateName: ["Nana B Enterprise", "Nana B Appliances Ghana"],
+        publisher: { "@id": `${siteUrl}/#business` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteUrl}/search?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      },
+      {
+        "@type": ["Store", "HomeGoodsStore", "Organization"],
+        "@id": `${siteUrl}/#business`,
+        url: siteUrl,
+        name: "Nana B Enterprises",
+        alternateName: "Nana B Enterprise",
+        description: "Wholesale and retail home, kitchen and lifestyle appliances in Makola, Accra, Ghana.",
+        logo: {
+          "@type": "ImageObject",
+          url: `${siteUrl}/assets/nana-b-logo.jpg`,
+        },
+        image: `${siteUrl}/assets/appliance-showroom.png`,
+        telephone: "+233244018530",
+        email: "nanabooakye1@gmail.com",
+        priceRange: "GH₵",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Makola Shopping Mall, opposite Georgina Stores, Angelina House, 1st Floor, Shop 31",
+          addressLocality: "Accra",
+          addressCountry: "GH",
+        },
+        areaServed: { "@type": "Country", name: "Ghana" },
+        sameAs: [
+          "https://www.instagram.com/nana_b_enterprises/",
+          "https://www.facebook.com/share/1GC8MPxyDJ/",
+        ],
+      },
     ],
   };
 
@@ -91,7 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-[#F7F8FB] text-ink antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(searchSchema) }}
         />
         <AuthProvider>
           <CartProvider>
