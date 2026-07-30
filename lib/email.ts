@@ -1,4 +1,5 @@
 import { formatGHS } from "./money";
+import { siteUrl } from "./site";
 
 type EmailMessage = {
   to: string;
@@ -107,7 +108,7 @@ export async function notifyOwnerOfOrder(order: OrderEmail) {
       <ul style="padding-left:20px">${itemRows}</ul>
       <p><strong>Phone:</strong> ${escapeHtml(order.phone)}<br/>
       <strong>Delivery:</strong> ${escapeHtml(order.address)}, ${escapeHtml(order.city)}</p>
-      <p style="margin-top:24px"><a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/admin/orders" style="background:#123d91;color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:bold">Open admin orders</a></p>
+      <p style="margin-top:24px"><a href="${siteUrl}/admin/orders" style="background:#123d91;color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:bold">Open admin orders</a></p>
     `),
   });
 }
@@ -126,7 +127,7 @@ export async function notifyCustomerOfStatus(order: OrderEmail) {
         <strong>Order:</strong> ${escapeHtml(order.reference)}<br/>
         <strong>Total:</strong> ${formatGHS(order.total)}
       </div>
-      <p><a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/account/orders" style="color:#123d91;font-weight:bold">View your orders</a></p>
+      <p><a href="${siteUrl}/account/orders" style="color:#123d91;font-weight:bold">View your orders</a></p>
     `),
   });
 }

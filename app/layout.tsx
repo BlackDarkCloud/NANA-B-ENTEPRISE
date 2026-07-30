@@ -6,9 +6,10 @@ import BottomNav from "@/components/BottomNav";
 import AuthProvider from "@/components/AuthProvider";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Nana B Enterprises | Home Appliances in Accra, Ghana",
     template: "%s | Nana B Enterprises",
@@ -69,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     "@type": ["Store", "HomeGoodsStore"],
     name: "Nana B Enterprises",
     description: "Wholesale and retail home, kitchen and lifestyle appliances in Accra, Ghana.",
-    image: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/assets/appliance-showroom.png`,
+    image: `${siteUrl}/assets/appliance-showroom.png`,
     telephone: "+233244018530",
     priceRange: "GH₵",
     address: {

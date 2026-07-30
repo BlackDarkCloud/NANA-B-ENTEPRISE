@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { auth } from "@/lib/auth";
 import { notifyCustomerOfStatus, notifyOwnerOfOrder } from "@/lib/email";
+import { siteUrl } from "@/lib/site";
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -94,7 +95,7 @@ export async function POST(req: Request) {
       email,
       amount: total, // pesewas
       reference,
-      callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/order/confirm?ref=${reference}`,
+      callback_url: `${siteUrl}/order/confirm?ref=${reference}`,
       metadata: { orderId: order.id },
     });
 

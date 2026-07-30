@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,6 @@ function escapeXml(value: string) {
 }
 
 export async function GET() {
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
   const staticPages = [
     { path: "", priority: "1.0", frequency: "daily" },
     { path: "/category/home-appliances", priority: "0.8", frequency: "weekly" },
@@ -33,14 +33,14 @@ export async function GET() {
   const urls = [
     ...staticPages.map(
       (page) => `<url>
-  <loc>${escapeXml(`${baseUrl}${page.path}`)}</loc>
+  <loc>${escapeXml(`${siteUrl}${page.path}`)}</loc>
   <changefreq>${page.frequency}</changefreq>
   <priority>${page.priority}</priority>
 </url>`,
     ),
     ...products.map(
       (product) => `<url>
-  <loc>${escapeXml(`${baseUrl}/products/${product.slug}`)}</loc>
+  <loc>${escapeXml(`${siteUrl}/products/${product.slug}`)}</loc>
   <lastmod>${product.updatedAt.toISOString()}</lastmod>
   <changefreq>weekly</changefreq>
   <priority>0.9</priority>

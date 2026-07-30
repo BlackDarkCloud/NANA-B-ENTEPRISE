@@ -5,6 +5,7 @@ import { formatGHS } from "@/lib/money";
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -41,19 +42,18 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const product = await prisma.product.findUnique({ where: { slug: params.slug } });
   if (!product || !product.active) notFound();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const publicImage = product.images.find((image) => image.startsWith("/"));
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: [`${baseUrl}${publicImage || "/assets/appliance-showroom.png"}`],
+    image: [`${siteUrl}${publicImage || "/assets/appliance-showroom.png"}`],
     sku: product.id,
     brand: { "@type": "Brand", name: "Nana B Enterprises" },
     offers: {
       "@type": "Offer",
-      url: `${baseUrl}/products/${product.slug}`,
+      url: `${siteUrl}/products/${product.slug}`,
       priceCurrency: "GHS",
       price: (product.price / 100).toFixed(2),
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
