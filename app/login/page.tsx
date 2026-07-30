@@ -21,7 +21,11 @@ export default function LoginPage() {
     if (result?.error) setError("That email or password is not correct.");
     else {
       const session = await fetch("/api/auth/session").then((response) => response.json());
-      router.push(session?.user?.role === "ADMIN" ? "/admin" : "/account");
+      const requestedUrl = new URLSearchParams(window.location.search).get("callbackUrl");
+      const safeCallback = requestedUrl?.startsWith("/") && !requestedUrl.startsWith("//")
+        ? requestedUrl
+        : "/account";
+      router.push(session?.user?.role === "ADMIN" ? "/admin" : safeCallback);
       router.refresh();
     }
   }

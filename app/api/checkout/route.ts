@@ -7,6 +7,16 @@ import { notifyCustomerOfStatus, notifyOwnerOfOrder } from "@/lib/email";
 import { siteUrl } from "@/lib/site";
 
 export async function POST(req: Request) {
+  const session = await auth();
+  const userId = (session?.user as any)?.id as string | undefined;
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Please sign in or create an account before checkout." },
+      { status: 401 },
+    );
+  }
+
   const body = await req.json();
   const { items, zoneId, couponCode, fullName, email, phone, address, city, notes } = body;
 
@@ -52,23 +62,6 @@ export async function POST(req: Request) {
 
   const total = subtotal + deliveryFee - discount;
   const reference = `NANAB-${nanoid(10)}`;
-
-  // Get or create a lightweight user record tied to this email (guest checkout support)
-  const session = await auth();
-  let userId = (session?.user as any)?.id as string | undefined;
-
-  if (!userId) {
-    const guest = await prisma.user.upsert({
-      where: { email },
-      update: {},
-      create: {
-        name: fullName,
-        email,
-        password: "GUEST_NO_LOGIN", // guest accounts can't log in until they register properly
-      },
-    });
-    userId = guest.id;
-  }
 
   const order = await prisma.order.create({
     data: {
