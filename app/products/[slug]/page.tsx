@@ -4,15 +4,69 @@ import AddToCartButton from "@/components/AddToCartButton";
 import { formatGHS } from "@/lib/money";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const product = await prisma.product.findUnique({
+    where: { slug: params.slug },
+    select: { name: true, description: true, images: true, active: true },
+  });
+
+  if (!product?.active) return {};
+
+  const shareImage = product.images.find((image) => image.startsWith("/"));
+
+  return {
+    title: product.name,
+    description: product.description.slice(0, 160),
+    alternates: { canonical: `/products/${params.slug}` },
+    openGraph: {
+      type: "website",
+      title: `${product.name} | Nana B Enterprises`,
+      description: product.description.slice(0, 160),
+      url: `/products/${params.slug}`,
+      images: [shareImage || "/assets/appliance-showroom.png"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.name} | Nana B Enterprises`,
+      description: product.description.slice(0, 160),
+      images: [shareImage || "/assets/appliance-showroom.png"],
+    },
+  };
+}
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const product = await prisma.product.findUnique({ where: { slug: params.slug } });
   if (!product || !product.active) notFound();
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const publicImage = product.images.find((image) => image.startsWith("/"));
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: [`${baseUrl}${publicImage || "/assets/appliance-showroom.png"}`],
+    sku: product.id,
+    brand: { "@type": "Brand", name: "Nana B Enterprises" },
+    offers: {
+      "@type": "Offer",
+      url: `${baseUrl}/products/${product.slug}`,
+      priceCurrency: "GHS",
+      price: (product.price / 100).toFixed(2),
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
 
   return (
     <div className="site-shell py-8 sm:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       <div className="mb-6 text-xs text-slate-500"><Link href="/" className="hover:text-brand">Home</Link><span className="px-2">/</span>{product.name}</div>
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#EFF2F6]">
