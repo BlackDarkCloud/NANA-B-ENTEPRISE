@@ -40,7 +40,17 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 py-5 text-center text-xs text-white/50">© {new Date().getFullYear()} Nana B Enterprises. Home of quality and professional appliances.</div>
+      <div className="border-t border-white/10 py-5 text-center text-xs text-white/50">
+        <p>© {new Date().getFullYear()} Nana B Enterprises. Home of quality and professional appliances.</p>
+        <a
+          href="https://wa.me/233200782852"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex font-semibold text-white/70 underline decoration-white/30 underline-offset-4 transition hover:text-white"
+        >
+          Contact website developer · +233 20 078 2852
+        </a>
+      </div>
     </footer>
   );
 }
