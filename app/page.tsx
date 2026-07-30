@@ -1,34 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
+import HeroCarousel from "@/components/HeroCarousel";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [categories, featured, latest] = await Promise.all([
+  const [categories, featured, latest, heroProducts] = await Promise.all([
     prisma.category.findMany(),
     prisma.product.findMany({ where: { active: true, featured: true }, include: { category: true }, take: 8 }),
     prisma.product.findMany({ where: { active: true }, include: { category: true }, orderBy: { createdAt: "desc" }, take: 8 }),
+    prisma.product.findMany({
+      where: { active: true, stock: { gt: 0 } },
+      select: { id: true, slug: true, name: true, price: true, images: true },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+      take: 5,
+    }),
   ]);
 
   return (
     <div className="bg-white">
       <section className="px-5 pb-7 pt-3 md:hidden">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-brand-dark shadow-sm">
-          <img src="/assets/appliance-showroom.png" alt="Nana B quality home appliances" className="absolute inset-0 h-full w-full object-cover object-[67%_center]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/85 via-brand-dark/10 to-brand-dark/30" />
-          <div className="absolute left-0 right-0 top-0 p-6 text-white">
-            <p className="text-[10px] font-black uppercase tracking-[.22em] text-white/70">Nana B Enterprises</p>
-            <h1 className="mt-3 max-w-[260px] text-3xl font-black leading-[1.05] tracking-tight">Quality appliances for every home.</h1>
-            <p className="mt-3 max-w-[245px] text-xs leading-5 text-white/80">Wholesale and retail with trusted delivery across Ghana.</p>
-            <a href="#best-sellers" className="mt-5 inline-flex rounded-lg bg-brand-red px-4 py-2.5 text-xs font-bold text-white">Shop best sellers</a>
-          </div>
-          <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
-            <span className="h-2 w-2 rounded-full bg-white" />
-            <span className="h-2 w-2 rounded-full bg-white/45" />
-            <span className="h-2 w-2 rounded-full bg-white/45" />
-          </div>
-        </div>
+        <HeroCarousel products={heroProducts} mobile />
       </section>
 
       <section className="relative hidden overflow-hidden bg-[#F4F0EB] md:block">
@@ -41,7 +34,7 @@ export default async function HomePage() {
             <div className="mt-9 flex gap-6 text-xs font-semibold text-slate-600"><span>✓ Secure checkout</span><span>✓ Nationwide delivery</span><span>✓ Friendly support</span></div>
           </div>
           <div className="relative h-[570px] self-end">
-            <img src="/assets/appliance-showroom.png" alt="A curated range of Nana B home appliances" className="absolute inset-0 h-full w-full object-cover object-[62%_center]" />
+            <HeroCarousel products={heroProducts} />
             <div className="absolute bottom-6 right-8 rounded-2xl bg-white/95 p-4 shadow-xl"><p className="text-xs font-bold uppercase tracking-widest text-brand-red">Visit us in Makola</p><p className="mt-1 text-sm font-bold text-brand-dark">Angelina House • 1st Floor • Shop 31</p></div>
           </div>
         </div>
