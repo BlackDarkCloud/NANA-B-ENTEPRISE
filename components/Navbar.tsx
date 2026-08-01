@@ -48,6 +48,9 @@ export default function Navbar() {
               <Link onClick={() => setMenuOpen(false)} href="/category/home-appliances" className="rounded-xl bg-slate-50 p-3">Appliances</Link>
               <Link onClick={() => setMenuOpen(false)} href="/category/kitchen-dining" className="rounded-xl bg-slate-50 p-3">Kitchen</Link>
               <Link onClick={() => setMenuOpen(false)} href="/category/lifestyle" className="rounded-xl bg-slate-50 p-3">Lifestyle</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/about" className="rounded-xl bg-slate-50 p-3">About us</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/delivery" className="rounded-xl bg-slate-50 p-3">Delivery</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/contact" className="rounded-xl bg-slate-50 p-3">Contact</Link>
             </nav>
             <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
               {session?.user ? (
@@ -86,13 +89,15 @@ export default function Navbar() {
       </div>
 
       <nav className="hidden border-t border-slate-100 md:block">
-        <div className="site-shell flex h-11 items-center gap-8 text-sm font-semibold text-slate-600">
+        <div className="site-shell flex h-11 items-center gap-6 text-sm font-semibold text-slate-600">
           <Link href="/" className="text-brand">Home</Link>
           <Link href="/category/home-appliances" className="hover:text-brand">Home appliances</Link>
           <Link href="/category/kitchen-dining" className="hover:text-brand">Kitchen & dining</Link>
           <Link href="/category/lifestyle" className="hover:text-brand">Lifestyle</Link>
+          <Link href="/about" className="hover:text-brand">About us</Link>
+          <Link href="/delivery" className="hover:text-brand">Delivery</Link>
           <a href="/#offers" className="hover:text-brand">Special offers</a>
-          <a href="#contact" className="hover:text-brand">Contact</a>
+          <Link href="/contact" className="hover:text-brand">Contact</Link>
         </div>
       </nav>
     </header>

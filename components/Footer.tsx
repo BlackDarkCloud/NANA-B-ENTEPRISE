@@ -18,6 +18,9 @@ export default function Footer() {
             <Link href="/category/home-appliances" className="block hover:text-white">Home appliances</Link>
             <Link href="/category/kitchen-dining" className="block hover:text-white">Kitchen & dining</Link>
             <Link href="/category/lifestyle" className="block hover:text-white">Lifestyle</Link>
+            <Link href="/about" className="block hover:text-white">About Nana B</Link>
+            <Link href="/delivery" className="block hover:text-white">Delivery across Ghana</Link>
+            <Link href="/contact" className="block hover:text-white">Contact and socials</Link>
             <Link href="/account/orders" className="block hover:text-white">Track my orders</Link>
             <Link href="/admin/login" className="block hover:text-white">Administrator sign in</Link>
           </div>

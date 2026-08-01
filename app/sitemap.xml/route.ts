@@ -15,16 +15,19 @@ function escapeXml(value: string) {
 export async function GET() {
   const staticPages = [
     { path: "", priority: "1.0", frequency: "daily" },
+    { path: "/about", priority: "0.8", frequency: "monthly" },
+    { path: "/delivery", priority: "0.8", frequency: "monthly" },
+    { path: "/contact", priority: "0.8", frequency: "monthly" },
     { path: "/category/home-appliances", priority: "0.8", frequency: "weekly" },
     { path: "/category/kitchen-dining", priority: "0.8", frequency: "weekly" },
     { path: "/category/lifestyle", priority: "0.8", frequency: "weekly" },
   ];
 
-  let products: Array<{ slug: string; updatedAt: Date }> = [];
+  let products: Array<{ id: string; slug: string; updatedAt: Date }> = [];
   try {
     products = await prisma.product.findMany({
       where: { active: true },
-      select: { slug: true, updatedAt: true },
+      select: { id: true, slug: true, updatedAt: true },
     });
   } catch {
     // Keep the core sitemap available if the database is temporarily sleeping.
@@ -34,6 +37,7 @@ export async function GET() {
     ...staticPages.map(
       (page) => `<url>
   <loc>${escapeXml(`${siteUrl}${page.path}`)}</loc>
+  ${page.path === "" ? `<image:image><image:loc>${escapeXml(`${siteUrl}/assets/appliance-showroom.png`)}</image:loc><image:title>Nana B Enterprises home appliances</image:title></image:image>` : ""}
   <changefreq>${page.frequency}</changefreq>
   <priority>${page.priority}</priority>
 </url>`,
@@ -41,6 +45,7 @@ export async function GET() {
     ...products.map(
       (product) => `<url>
   <loc>${escapeXml(`${siteUrl}/products/${product.slug}`)}</loc>
+  <image:image><image:loc>${escapeXml(`${siteUrl}/api/products/${product.id}/image`)}</image:loc></image:image>
   <lastmod>${product.updatedAt.toISOString()}</lastmod>
   <changefreq>weekly</changefreq>
   <priority>0.9</priority>
@@ -50,7 +55,7 @@ export async function GET() {
 
   return new Response(
     `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls}
 </urlset>`,
     {

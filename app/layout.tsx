@@ -29,6 +29,11 @@ export const metadata: Metadata = {
     "TVs fridges washing machines Accra",
   ],
   applicationName: "Nana B Enterprises",
+  icons: {
+    icon: [{ url: "/icon.jpg", type: "image/jpeg", sizes: "512x512" }],
+    shortcut: "/icon.jpg",
+    apple: "/icon.jpg",
+  },
   authors: [{ name: "Nana B Enterprises" }],
   creator: "Nana B Enterprises",
   publisher: "Nana B Enterprises",
