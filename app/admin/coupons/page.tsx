@@ -12,6 +12,7 @@ type Coupon = {
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     code: "", type: "PERCENTAGE", value: "", minOrderAmount: "", maxUses: "", expiresAt: "",
   });
@@ -24,6 +25,7 @@ export default function AdminCouponsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setSaving(true);
     const res = await fetch("/api/admin/coupons", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -36,9 +38,10 @@ export default function AdminCouponsPage() {
         expiresAt: form.expiresAt || null,
       }),
     });
+    setSaving(false);
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error || "Failed to create coupon");
+      setError(data.error || "Could not create coupon.");
       return;
     }
     setForm({ code: "", type: "PERCENTAGE", value: "", minOrderAmount: "", maxUses: "", expiresAt: "" });
@@ -56,46 +59,64 @@ export default function AdminCouponsPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold mb-4">Coupons</h1>
+      <span className="eyebrow">Promotions</span>
+      <h1 className="mt-2 text-3xl font-black tracking-tight text-brand-dark">Coupons</h1>
+      <p className="mt-2 text-sm text-slate-500">Create discount codes and turn them on or off at any time.</p>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-2 mb-6 max-w-xl">
-        <input required placeholder="Code (e.g. WELCOME10)" className="border rounded-lg p-2 col-span-2"
-          value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
-        <select className="border rounded-lg p-2" value={form.type}
-          onChange={(e) => setForm({ ...form, type: e.target.value })}>
-          <option value="PERCENTAGE">Percentage %</option>
-          <option value="FIXED">Fixed amount (GHS)</option>
-        </select>
-        <input required type="number" placeholder={form.type === "PERCENTAGE" ? "e.g. 10 (%)" : "e.g. 20 (GHS)"}
-          className="border rounded-lg p-2" value={form.value}
-          onChange={(e) => setForm({ ...form, value: e.target.value })} />
-        <input type="number" placeholder="Min order (GHS, optional)" className="border rounded-lg p-2"
-          value={form.minOrderAmount} onChange={(e) => setForm({ ...form, minOrderAmount: e.target.value })} />
-        <input type="number" placeholder="Max uses (optional)" className="border rounded-lg p-2"
-          value={form.maxUses} onChange={(e) => setForm({ ...form, maxUses: e.target.value })} />
-        <input type="date" className="border rounded-lg p-2 col-span-2" value={form.expiresAt}
-          onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} />
-        <button className="bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold col-span-2">
-          Create Coupon
-        </button>
+      <form onSubmit={handleSubmit} className="mt-7 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-sm font-bold">Coupon code</label>
+            <input required placeholder="e.g. WELCOME10" className="form-input uppercase" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-bold">Discount type</label>
+            <select className="form-input" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+              <option value="PERCENTAGE">Percentage %</option>
+              <option value="FIXED">Fixed amount (GHS)</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-bold">Discount value</label>
+            <input required type="number" min="0" placeholder={form.type === "PERCENTAGE" ? "e.g. 10" : "e.g. 20"} className="form-input" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-bold">Minimum order (optional)</label>
+            <input type="number" min="0" placeholder="GHS" className="form-input" value={form.minOrderAmount} onChange={(e) => setForm({ ...form, minOrderAmount: e.target.value })} />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-bold">Max uses (optional)</label>
+            <input type="number" min="0" placeholder="Unlimited" className="form-input" value={form.maxUses} onChange={(e) => setForm({ ...form, maxUses: e.target.value })} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-sm font-bold">Expiry date (optional)</label>
+            <input type="date" className="form-input" value={form.expiresAt} onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} />
+          </div>
+        </div>
+        {error && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+        <button disabled={saving} className="w-full rounded-xl bg-brand px-5 py-3.5 text-sm font-bold text-white hover:bg-brand-dark disabled:opacity-50 sm:w-fit">{saving ? "Creating..." : "Create coupon"}</button>
       </form>
-      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-      <div className="space-y-2 max-w-xl">
-        {coupons.map((c) => (
-          <div key={c.id} className="border rounded-lg p-3 flex justify-between items-center text-sm">
+      <div className="mt-7 space-y-3">
+        {coupons.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
+            <h2 className="font-bold text-brand-dark">No coupons yet</h2>
+            <p className="mt-2 text-sm text-slate-500">Coupons you create will appear here.</p>
+          </div>
+        ) : coupons.map((c) => (
+          <div key={c.id} className={`flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-soft ${!c.active ? "opacity-60" : ""}`}>
             <div>
-              <p className="font-medium">{c.code}</p>
-              <p className="text-gray-500">
+              <p className="font-black tracking-wide text-brand-dark">{c.code}</p>
+              <p className="mt-1 text-sm text-slate-500">
                 {c.type === "PERCENTAGE" ? `${c.value}% off` : `${formatGHS(c.value)} off`}
                 {c.minOrderAmount > 0 && ` · min ${formatGHS(c.minOrderAmount)}`}
                 {c.maxUses && ` · ${c.usedCount}/${c.maxUses} used`}
               </p>
-              {c.expiresAt && <p className="text-xs text-gray-400">Expires {new Date(c.expiresAt).toLocaleDateString()}</p>}
+              {c.expiresAt && <p className="mt-1 text-xs text-slate-400">Expires {new Date(c.expiresAt).toLocaleDateString()}</p>}
             </div>
             <button
               onClick={() => toggleActive(c)}
-              className={`text-xs px-3 py-1 rounded-full ${c.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
+              className={`rounded-full px-4 py-2 text-xs font-bold transition ${c.active ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
             >
               {c.active ? "Active" : "Disabled"}
             </button>

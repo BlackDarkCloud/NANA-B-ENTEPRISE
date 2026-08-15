@@ -22,7 +22,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#F3F5F9] lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="hidden min-h-screen bg-brand-dark p-5 text-white lg:flex lg:flex-col">
+      <aside className="hidden min-h-screen bg-gradient-to-b from-brand-dark to-[#051a45] p-5 text-white lg:flex lg:flex-col">
         <Link href="/admin" className="rounded-2xl border border-white/10 bg-white/10 p-4">
           <p className="text-lg font-black">NANA B</p>
           <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/50">Administrator account</p>
@@ -45,12 +45,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </aside>
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-7 lg:px-10">
+        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur sm:px-7 lg:px-10">
           <div><p className="text-sm font-black text-brand-dark">Nana B Management</p><p className="text-[10px] text-slate-400">Private administration area</p></div>
           <div className="flex items-center gap-3"><Link href="/" className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600">View store</Link><span className="hidden rounded-full bg-emerald-50 px-3 py-2 text-[10px] font-bold text-emerald-700 sm:inline">Secure admin session</span></div>
         </header>
         <nav className="sticky top-16 z-30 flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
-          {links.map((link) => <Link key={link.href} href={link.href} className="whitespace-nowrap rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700">{link.label}</Link>)}
+          {links.map((link) => {
+            const active = link.href === "/admin" ? pathname === link.href : pathname.startsWith(link.href);
+            return (
+              <Link key={link.href} href={link.href} className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${active ? "bg-brand text-white" : "bg-slate-100 text-slate-700"}`}>{link.label}</Link>
+            );
+          })}
         </nav>
         <main className="mx-auto max-w-[1400px] p-4 pb-24 sm:p-7 lg:p-10">{children}</main>
       </div>

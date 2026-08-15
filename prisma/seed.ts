@@ -39,6 +39,14 @@ async function main() {
       description: "A dependable everyday blender with a generous glass jug and variable speed control for smoothies, soups, sauces and more.",
       price: 69900, compareAtPrice: 79900, images: ["/assets/blender.jpg"], stock: 18, featured: true,
       categoryId: categoryId("kitchen-dining"),
+      keyFeatures: ["1200W high-torque motor", "6-speed control with pulse function", "1.5L shatterproof glass jug", "Stainless steel blades for smooth blending"],
+      specifications: [
+        { label: "Power", value: "1200W" },
+        { label: "Jug capacity", value: "1.5 litres" },
+        { label: "Material", value: "Glass jug, stainless steel blade" },
+        { label: "Warranty", value: "1 year" },
+      ],
+      boxContents: ["1x Blender base", "1x Glass jug with lid", "1x Recipe booklet"],
     },
     {
       name: "Digital Family Air Fryer",
@@ -46,6 +54,14 @@ async function main() {
       description: "Enjoy crisp, delicious meals with less oil. The roomy basket and simple controls make everyday cooking quicker and cleaner.",
       price: 89900, compareAtPrice: 99900, images: ["/assets/air-fryer.jpg"], stock: 15, featured: true,
       categoryId: categoryId("kitchen-dining"),
+      keyFeatures: ["Digital touch display with 8 presets", "5.5L family-size non-stick basket", "Up to 85% less oil than deep frying", "Auto shut-off for safe cooking"],
+      specifications: [
+        { label: "Capacity", value: "5.5 litres" },
+        { label: "Power", value: "1700W" },
+        { label: "Temperature range", value: "80°C – 200°C" },
+        { label: "Warranty", value: "1 year" },
+      ],
+      boxContents: ["1x Air fryer unit", "1x Removable non-stick basket", "1x User manual"],
     },
     {
       name: "1.7L Electric Kettle",

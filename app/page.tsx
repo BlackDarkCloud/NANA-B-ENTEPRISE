@@ -6,7 +6,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [categories, featured, latest, heroProducts] = await Promise.all([
+  const [categories, featured, latest, heroProductRows] = await Promise.all([
     prisma.category.findMany(),
     prisma.product.findMany({ where: { active: true, featured: true }, include: { category: true }, take: 8 }),
     prisma.product.findMany({ where: { active: true }, include: { category: true }, orderBy: { createdAt: "desc" }, take: 8 }),
@@ -17,6 +17,21 @@ export default async function HomePage() {
       take: 5,
     }),
   ]);
+
+  // Only the first image of each product is ever shown in the hero banner, but this
+  // is a Client Component boundary — Next.js has to serialize whatever prop it's given
+  // and send it down as part of the page payload. Passing the full `images` array here
+  // (up to 4 full-size base64 images per product, rendered twice for mobile + desktop)
+  // could bloat that payload past hosting response-size limits and crash the page with
+  // a generic "server-side exception". Trimming to a single image per product keeps the
+  // payload small and avoids that failure mode.
+  const heroProducts = heroProductRows.map((product) => ({
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    price: product.price,
+    images: product.images[0] ? [product.images[0]] : [],
+  }));
 
   return (
     <div className="bg-white">

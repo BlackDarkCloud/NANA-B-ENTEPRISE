@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
@@ -7,6 +8,15 @@ import AuthProvider from "@/components/AuthProvider";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { siteUrl } from "@/lib/site";
+
+// A modern, geometric sans with real variable weights — swapped in for the previous
+// system-font fallback stack (the site referenced "Inter" in Tailwind but never
+// actually loaded it, so it was silently rendering in the browser's default font).
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -120,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en">
+    <html lang="en" className={jakarta.variable}>
       <body className="bg-[#F7F8FB] text-ink antialiased">
         <script
           type="application/ld+json"

@@ -12,6 +12,9 @@ const productSchema = z.object({
   images: z.array(z.string().min(1)).min(1).max(4),
   stock: z.number().int().nonnegative(),
   categoryId: z.string().min(1),
+  keyFeatures: z.array(z.string().min(1)).max(20).default([]),
+  specifications: z.array(z.object({ label: z.string().min(1), value: z.string().min(1) })).max(30).default([]),
+  boxContents: z.array(z.string().min(1)).max(30).default([]),
   featured: z.boolean(),
   active: z.boolean(),
 });

@@ -64,6 +64,10 @@ model Product {
   category        Category    @relation(fields: [categoryId], references: [id])
   orderItems      OrderItem[]
   wishlistItems   WishlistItem[]
+  // Product detail content shown on the product page
+  keyFeatures     String[]    @default([]) // short bullet points, e.g. "1200W motor"
+  specifications  Json?       // array of { label, value } pairs, e.g. [{"label":"Weight","value":"2.4kg"}]
+  boxContents     String[]    @default([]) // e.g. "1x Blender base", "1x Recipe booklet"
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 

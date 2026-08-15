@@ -2,11 +2,21 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/AddToCartButton";
 import { formatGHS } from "@/lib/money";
-import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site";
 import ProductShareButton from "@/components/ProductShareButton";
+import ProductGallery from "@/components/ProductGallery";
+
+type SpecEntry = { label: string; value: string };
+
+function parseSpecifications(value: unknown): SpecEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (entry): entry is SpecEntry =>
+      Boolean(entry) && typeof entry === "object" && typeof (entry as any).label === "string" && typeof (entry as any).value === "string",
+  );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +53,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const product = await prisma.product.findUnique({ where: { slug: params.slug } });
   if (!product || !product.active) notFound();
+  const specifications = parseSpecifications(product.specifications);
+  const hasDetails = product.keyFeatures.length > 0 || specifications.length > 0 || product.boxContents.length > 0;
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -69,8 +81,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
       />
       <div className="mb-6 text-xs text-slate-500"><Link href="/" className="hover:text-brand">Home</Link><span className="px-2">/</span>{product.name}</div>
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#EFF2F6]">
-          {product.images[0] && <Image src={product.images[0]} alt={product.name} fill priority unoptimized={product.images[0].startsWith("data:")} className="object-cover" />}
+        <div>
+          <ProductGallery images={product.images} name={product.name} />
         </div>
         <div className="self-center">
           <span className="eyebrow">Nana B quality pick</span>
@@ -96,6 +108,52 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
         </div>
       </div>
+
+      {hasDetails && (
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+          {product.keyFeatures.length > 0 && (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-black text-brand-dark">Key features</h2>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+                {product.keyFeatures.map((feature, index) => (
+                  <li key={index} className="flex gap-2.5">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {specifications.length > 0 && (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-black text-brand-dark">Specifications</h2>
+              <dl className="mt-4 divide-y divide-slate-100 text-sm">
+                {specifications.map((spec, index) => (
+                  <div key={index} className="flex justify-between gap-4 py-2.5">
+                    <dt className="text-slate-500">{spec.label}</dt>
+                    <dd className="text-right font-semibold text-slate-800">{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+
+          {product.boxContents.length > 0 && (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-lg font-black text-brand-dark">What's in the box</h2>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+                {product.boxContents.map((item, index) => (
+                  <li key={index} className="flex gap-2.5">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      )}
     </div>
   );
 }

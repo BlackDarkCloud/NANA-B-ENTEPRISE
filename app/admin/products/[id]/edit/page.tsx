@@ -4,6 +4,14 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
+function parseSpecifications(value: unknown): { label: string; value: string }[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (entry): entry is { label: string; value: string } =>
+      Boolean(entry) && typeof entry === "object" && typeof (entry as any).label === "string" && typeof (entry as any).value === "string",
+  );
+}
+
 export default async function EditProductPage({ params }: { params: { id: string } }) {
   const product = await prisma.product.findUnique({ where: { id: params.id } });
   if (!product) notFound();
@@ -17,6 +25,7 @@ export default async function EditProductPage({ params }: { params: { id: string
         id: product.id, name: product.name, slug: product.slug, description: product.description,
         price: (product.price / 100).toString(), compareAtPrice: product.compareAtPrice ? (product.compareAtPrice / 100).toString() : "",
         stock: product.stock.toString(), categoryId: product.categoryId, featured: product.featured, active: product.active, images: product.images,
+        keyFeatures: product.keyFeatures, specifications: parseSpecifications(product.specifications), boxContents: product.boxContents,
       }} />
     </div>
   );

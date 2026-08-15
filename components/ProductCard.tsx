@@ -23,9 +23,9 @@ export default function ProductCard({ product }: Props) {
     : null;
 
   return (
-    <article className="group min-w-0 bg-white">
+    <article className="group min-w-0 rounded-2xl bg-white p-2 transition duration-300 hover:shadow-card">
       <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#F4F5F7]">
+        <div className="relative aspect-square overflow-hidden rounded-xl bg-[#F4F5F7]">
           {discount && <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-brand-red px-2 py-1.5 text-[10px] font-bold text-white sm:left-3 sm:top-3">{discount}% off</span>}
           <WishlistButton productId={product.id} />
           {product.images[0] && <Image src={product.images[0]} alt={product.name} fill unoptimized={product.images[0].startsWith("data:")} className="object-cover transition duration-500 group-hover:scale-105" />}
