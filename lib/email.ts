@@ -59,7 +59,7 @@ export function emailNotificationsConfigured() {
 }
 
 export function ownerEmailAddress() {
-  return process.env.OWNER_EMAIL || "nanabooakye1@gmail.com";
+  return process.env.OWNER_EMAIL || "";
 }
 
 export async function sendEmail(message: EmailMessage) {
