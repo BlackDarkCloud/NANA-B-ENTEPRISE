@@ -3,9 +3,12 @@
   publish = ".next"
 
 [build.environment]
-  # Paystack's public key is intentionally embedded in the checkout client.
-  # The secret key is used only inside Netlify's protected server functions.
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,PAYSTACK_SECRET_KEY"
+  # NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: Paystack's public key is intentionally embedded in the checkout client.
+  # PAYSTACK_SECRET_KEY: used only inside Netlify's protected server functions, never exposed to the browser.
+  # NEXT_PUBLIC_APP_URL: the site's own public URL, baked into the client bundle by design (Next.js convention).
+  # OWNER_EMAIL: the business's public contact email, already shown site-wide in page metadata/schema.
+  # None of these are actual secrets, so they're excluded from Netlify's build-output secret scan.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,PAYSTACK_SECRET_KEY,NEXT_PUBLIC_APP_URL,OWNER_EMAIL"
 
 [context.production.environment]
   NEXT_PUBLIC_APP_URL = "https://nanabenterprises.com"

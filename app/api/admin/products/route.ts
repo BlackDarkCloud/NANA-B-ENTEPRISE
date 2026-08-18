@@ -16,28 +16,20 @@ const productSchema = z.object({
   specifications: z.array(z.object({ label: z.string().min(1), value: z.string().min(1) })).max(30).default([]),
   boxContents: z.array(z.string().min(1)).max(30).default([]),
   featured: z.boolean(),
-  active: z.boolean(),
+  active: z.boolean().default(true),
 });
 
-async function isAdmin() {
+export async function POST(request: Request) {
   const session = await auth();
-  return (session?.user as any)?.role === "ADMIN";
-}
+  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const parsed = productSchema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Please check all product details." }, { status: 400 });
+
   try {
-    const product = await prisma.product.update({ where: { id: params.id }, data: parsed.data });
+    const product = await prisma.product.create({ data: parsed.data });
     return NextResponse.json(product);
   } catch (error: any) {
-    return NextResponse.json({ error: error?.code === "P2002" ? "That product URL name already exists." : "Could not update product." }, { status: 400 });
+    return NextResponse.json({ error: error?.code === "P2002" ? "That product URL name already exists." : "Could not create product." }, { status: 400 });
   }
-}
-
-export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  await prisma.product.update({ where: { id: params.id }, data: { active: false } });
-  return NextResponse.json({ success: true });
 }
