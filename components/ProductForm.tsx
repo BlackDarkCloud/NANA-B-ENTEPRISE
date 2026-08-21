@@ -22,6 +22,37 @@ type InitialProduct = {
   boxContents: string[];
 };
 
+// Key features and box contents are just one item per line of plain text —
+// far easier to type than filling in a row of small boxes one at a time.
+function linesToList(text: string): string[] {
+  return text.split("\n").map((line) => line.trim()).filter(Boolean);
+}
+
+// Specifications are typed as "Label: Value", one per line, e.g. "Capacity: 1.7 litres".
+// Lines without a colon are ignored rather than rejected, so a stray line doesn't block saving.
+function linesToSpecs(text: string): SpecEntry[] {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const separatorIndex = line.indexOf(":");
+      if (separatorIndex === -1) return null;
+      const label = line.slice(0, separatorIndex).trim();
+      const value = line.slice(separatorIndex + 1).trim();
+      return label && value ? { label, value } : null;
+    })
+    .filter((entry): entry is SpecEntry => entry !== null);
+}
+
+function listToLines(list: string[]): string {
+  return list.join("\n");
+}
+
+function specsToLines(specs: SpecEntry[]): string {
+  return specs.map((spec) => `${spec.label}: ${spec.value}`).join("\n");
+}
+
 // Product images are stored as base64 strings directly in the database (no external
 // image host is configured for this project). That makes it easy to blow past hosting
 // response-size limits if images are too large — every product image gets pulled into
@@ -92,6 +123,9 @@ export default function ProductForm({ initial }: { initial?: InitialProduct }) {
     categoryId: "", featured: false, active: true, images: [],
     keyFeatures: [], specifications: [], boxContents: [],
   });
+  const [keyFeaturesText, setKeyFeaturesText] = useState(listToLines(initial?.keyFeatures || []));
+  const [specificationsText, setSpecificationsText] = useState(specsToLines(initial?.specifications || []));
+  const [boxContentsText, setBoxContentsText] = useState(listToLines(initial?.boxContents || []));
 
   useEffect(() => {
     fetch("/api/admin/categories").then((response) => response.json()).then(setCategories);
@@ -136,11 +170,9 @@ export default function ProductForm({ initial }: { initial?: InitialProduct }) {
         price: Math.round(Number(form.price) * 100),
         compareAtPrice: form.compareAtPrice ? Math.round(Number(form.compareAtPrice) * 100) : null,
         stock: Number(form.stock),
-        keyFeatures: form.keyFeatures.map((item) => item.trim()).filter(Boolean),
-        boxContents: form.boxContents.map((item) => item.trim()).filter(Boolean),
-        specifications: form.specifications
-          .map((spec) => ({ label: spec.label.trim(), value: spec.value.trim() }))
-          .filter((spec) => spec.label && spec.value),
+        keyFeatures: linesToList(keyFeaturesText),
+        boxContents: linesToList(boxContentsText),
+        specifications: linesToSpecs(specificationsText),
       }),
     });
     if (!response.ok) {
@@ -159,7 +191,10 @@ export default function ProductForm({ initial }: { initial?: InitialProduct }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2"><label className="mb-1.5 block text-sm font-bold">Product name</label><input required className="form-input" value={form.name} onChange={(event) => updateName(event.target.value)} /></div>
           <div className="sm:col-span-2"><label className="mb-1.5 block text-sm font-bold">URL name</label><input required className="form-input" value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} /></div>
-          <div className="sm:col-span-2"><label className="mb-1.5 block text-sm font-bold">Description</label><textarea required rows={5} className="form-input" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} /></div>
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-sm font-bold">Description</label>
+            <textarea required rows={5} className="form-input" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
+          </div>
           <div><label className="mb-1.5 block text-sm font-bold">Selling price (GHS)</label><input required min="0" step="0.01" type="number" className="form-input" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} /></div>
           <div><label className="mb-1.5 block text-sm font-bold">Previous price (optional)</label><input min="0" step="0.01" type="number" className="form-input" value={form.compareAtPrice} onChange={(event) => setForm({ ...form, compareAtPrice: event.target.value })} /></div>
           <div><label className="mb-1.5 block text-sm font-bold">Stock quantity</label><input required min="0" type="number" className="form-input" value={form.stock} onChange={(event) => setForm({ ...form, stock: event.target.value })} /></div>
@@ -172,59 +207,41 @@ export default function ProductForm({ initial }: { initial?: InitialProduct }) {
 
         <div className="space-y-2 border-t border-slate-100 pt-5">
           <label className="block text-sm font-bold">Key features</label>
-          <p className="text-xs text-slate-500">Short bullet points shown on the product page, e.g. "1200W motor" or "Auto shut-off".</p>
-          {form.keyFeatures.map((feature, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                className="form-input"
-                placeholder="e.g. 5-speed control"
-                value={feature}
-                onChange={(event) => setForm({ ...form, keyFeatures: form.keyFeatures.map((item, itemIndex) => (itemIndex === index ? event.target.value : item)) })}
-              />
-              <button type="button" onClick={() => setForm({ ...form, keyFeatures: form.keyFeatures.filter((_, itemIndex) => itemIndex !== index) })} className="shrink-0 rounded-xl border border-slate-200 px-3 text-sm font-bold text-red-600">Remove</button>
-            </div>
-          ))}
-          <button type="button" onClick={() => setForm({ ...form, keyFeatures: [...form.keyFeatures, ""] })} className="rounded-xl border border-dashed border-slate-300 px-4 py-2 text-xs font-bold text-brand hover:border-brand">+ Add key feature</button>
+          <p className="text-xs text-slate-500">Type one feature per line — press Enter to start a new one. e.g.</p>
+          <p className="text-xs italic text-slate-400">1200W motor{"\n"}5-speed control{"\n"}Auto shut-off</p>
+          <textarea
+            rows={5}
+            className="form-input"
+            placeholder={"1200W motor\n5-speed control\nAuto shut-off"}
+            value={keyFeaturesText}
+            onChange={(event) => setKeyFeaturesText(event.target.value)}
+          />
         </div>
 
         <div className="space-y-2 border-t border-slate-100 pt-5">
           <label className="block text-sm font-bold">Specifications</label>
-          <p className="text-xs text-slate-500">Technical details shown as a spec sheet, e.g. "Capacity" — "1.7 litres".</p>
-          {form.specifications.map((spec, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                className="form-input"
-                placeholder="Label, e.g. Capacity"
-                value={spec.label}
-                onChange={(event) => setForm({ ...form, specifications: form.specifications.map((item, itemIndex) => (itemIndex === index ? { ...item, label: event.target.value } : item)) })}
-              />
-              <input
-                className="form-input"
-                placeholder="Value, e.g. 1.7 litres"
-                value={spec.value}
-                onChange={(event) => setForm({ ...form, specifications: form.specifications.map((item, itemIndex) => (itemIndex === index ? { ...item, value: event.target.value } : item)) })}
-              />
-              <button type="button" onClick={() => setForm({ ...form, specifications: form.specifications.filter((_, itemIndex) => itemIndex !== index) })} className="shrink-0 rounded-xl border border-slate-200 px-3 text-sm font-bold text-red-600">Remove</button>
-            </div>
-          ))}
-          <button type="button" onClick={() => setForm({ ...form, specifications: [...form.specifications, { label: "", value: "" }] })} className="rounded-xl border border-dashed border-slate-300 px-4 py-2 text-xs font-bold text-brand hover:border-brand">+ Add specification</button>
+          <p className="text-xs text-slate-500">Type one per line as "Label: Value" — e.g.</p>
+          <p className="text-xs italic text-slate-400">Capacity: 1.7 litres{"\n"}Power: 1200W{"\n"}Warranty: 1 year</p>
+          <textarea
+            rows={5}
+            className="form-input"
+            placeholder={"Capacity: 1.7 litres\nPower: 1200W\nWarranty: 1 year"}
+            value={specificationsText}
+            onChange={(event) => setSpecificationsText(event.target.value)}
+          />
         </div>
 
         <div className="space-y-2 border-t border-slate-100 pt-5">
           <label className="block text-sm font-bold">What's in the box</label>
-          <p className="text-xs text-slate-500">List each item included with the product, e.g. "1x Power adapter".</p>
-          {form.boxContents.map((item, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                className="form-input"
-                placeholder="e.g. 1x User manual"
-                value={item}
-                onChange={(event) => setForm({ ...form, boxContents: form.boxContents.map((entry, itemIndex) => (itemIndex === index ? event.target.value : entry)) })}
-              />
-              <button type="button" onClick={() => setForm({ ...form, boxContents: form.boxContents.filter((_, itemIndex) => itemIndex !== index) })} className="shrink-0 rounded-xl border border-slate-200 px-3 text-sm font-bold text-red-600">Remove</button>
-            </div>
-          ))}
-          <button type="button" onClick={() => setForm({ ...form, boxContents: [...form.boxContents, ""] })} className="rounded-xl border border-dashed border-slate-300 px-4 py-2 text-xs font-bold text-brand hover:border-brand">+ Add box item</button>
+          <p className="text-xs text-slate-500">Type one item per line — e.g.</p>
+          <p className="text-xs italic text-slate-400">1x Blender base{"\n"}1x Glass jug with lid{"\n"}1x Recipe booklet</p>
+          <textarea
+            rows={4}
+            className="form-input"
+            placeholder={"1x Blender base\n1x Glass jug with lid\n1x Recipe booklet"}
+            value={boxContentsText}
+            onChange={(event) => setBoxContentsText(event.target.value)}
+          />
         </div>
       </div>
 
