@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { signOut, useSession } from "next-auth/react";
 
@@ -10,9 +10,19 @@ export default function Navbar() {
   const { count } = useCart();
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
+    <header className={`sticky top-0 z-50 border-b bg-white/95 backdrop-blur transition-shadow duration-300 ${scrolled ? "border-slate-200 shadow-soft" : "border-transparent"}`}>
       <div className="hidden bg-brand-dark text-white md:block">
         <div className="site-shell flex h-8 items-center justify-between text-xs">
           <p>Wholesale & retail • Delivery across Ghana</p>
@@ -22,17 +32,17 @@ export default function Navbar() {
 
       <div className="md:hidden">
         <div className="relative flex h-[68px] items-center justify-between px-5">
-          <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)} className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full text-brand-dark">
-            <span className="h-0.5 w-5 bg-current" />
-            <span className="h-0.5 w-5 bg-current" />
-            <span className="h-0.5 w-5 bg-current" />
+          <button type="button" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)} className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full text-brand-dark transition-colors hover:bg-slate-100">
+            <span className={`h-0.5 w-5 bg-current transition-transform duration-300 ${menuOpen ? "translate-y-2 rotate-45" : ""}`} />
+            <span className={`h-0.5 w-5 bg-current transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`h-0.5 w-5 bg-current transition-transform duration-300 ${menuOpen ? "-translate-y-2 -rotate-45" : ""}`} />
           </button>
           <Link href="/" className="absolute left-1/2 -translate-x-1/2" aria-label="Nana B Enterprises home">
             <span className="whitespace-nowrap text-sm font-black tracking-[.08em] text-brand-dark">NANA B ENTERPRISES</span>
           </Link>
-          <Link href="/cart" className="relative rounded-full border border-slate-200 px-3 py-2 text-xs font-black text-brand-dark" aria-label={`Shopping bag with ${count} items`}>
+          <Link href="/cart" className="relative rounded-full border border-slate-200 px-3 py-2 text-xs font-black text-brand-dark transition-transform active:scale-90" aria-label={`Shopping bag with ${count} items`}>
             Bag
-            {count > 0 && <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-red px-1 text-[10px] text-white">{count}</span>}
+            {count > 0 && <span key={count} className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 animate-scale-in items-center justify-center rounded-full bg-brand-red px-1 text-[10px] text-white">{count}</span>}
           </Link>
         </div>
 
@@ -42,15 +52,15 @@ export default function Navbar() {
         </form>
 
         {menuOpen && (
-          <div className="absolute left-4 right-4 top-[120px] z-50 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl">
+          <div className="absolute left-4 right-4 top-[120px] z-50 animate-fade-in-up rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl">
             <nav className="grid grid-cols-2 gap-2 text-sm font-bold text-slate-700">
-              <Link onClick={() => setMenuOpen(false)} href="/" className="rounded-xl bg-slate-50 p-3">Shop</Link>
-              <Link onClick={() => setMenuOpen(false)} href="/category/home-appliances" className="rounded-xl bg-slate-50 p-3">Appliances</Link>
-              <Link onClick={() => setMenuOpen(false)} href="/category/kitchen-dining" className="rounded-xl bg-slate-50 p-3">Kitchen</Link>
-              <Link onClick={() => setMenuOpen(false)} href="/category/lifestyle" className="rounded-xl bg-slate-50 p-3">Lifestyle</Link>
-              <Link onClick={() => setMenuOpen(false)} href="/about" className="rounded-xl bg-slate-50 p-3">About us</Link>
-              <Link onClick={() => setMenuOpen(false)} href="/delivery" className="rounded-xl bg-slate-50 p-3">Delivery</Link>
-              <Link onClick={() => setMenuOpen(false)} href="/contact" className="rounded-xl bg-slate-50 p-3">Contact</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/" className="rounded-xl bg-slate-50 p-3 transition-colors active:bg-brand-light active:text-brand">Shop</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/category/home-appliances" className="rounded-xl bg-slate-50 p-3 transition-colors active:bg-brand-light active:text-brand">Appliances</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/category/kitchen-dining" className="rounded-xl bg-slate-50 p-3 transition-colors active:bg-brand-light active:text-brand">Kitchen</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/category/lifestyle" className="rounded-xl bg-slate-50 p-3 transition-colors active:bg-brand-light active:text-brand">Lifestyle</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/about" className="rounded-xl bg-slate-50 p-3 transition-colors active:bg-brand-light active:text-brand">About us</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/delivery" className="rounded-xl bg-slate-50 p-3 transition-colors active:bg-brand-light active:text-brand">Delivery</Link>
+              <Link onClick={() => setMenuOpen(false)} href="/contact" className="rounded-xl bg-slate-50 p-3 transition-colors active:bg-brand-light active:text-brand">Contact</Link>
             </nav>
             <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
               {session?.user ? (
@@ -90,14 +100,14 @@ export default function Navbar() {
 
       <nav className="hidden border-t border-slate-100 md:block">
         <div className="site-shell flex h-11 items-center gap-6 text-sm font-semibold text-slate-600">
-          <Link href="/" className="text-brand">Home</Link>
-          <Link href="/category/home-appliances" className="hover:text-brand">Home appliances</Link>
-          <Link href="/category/kitchen-dining" className="hover:text-brand">Kitchen & dining</Link>
-          <Link href="/category/lifestyle" className="hover:text-brand">Lifestyle</Link>
-          <Link href="/about" className="hover:text-brand">About us</Link>
-          <Link href="/delivery" className="hover:text-brand">Delivery</Link>
-          <a href="/#offers" className="hover:text-brand">Special offers</a>
-          <Link href="/contact" className="hover:text-brand">Contact</Link>
+          <Link href="/" className="relative py-1 text-brand after:absolute after:-bottom-[1px] after:left-0 after:h-0.5 after:w-full after:bg-brand after:content-['']">Home</Link>
+          <Link href="/category/home-appliances" className="group relative py-1 transition-colors hover:text-brand">Home appliances<span className="absolute -bottom-[1px] left-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" /></Link>
+          <Link href="/category/kitchen-dining" className="group relative py-1 transition-colors hover:text-brand">Kitchen & dining<span className="absolute -bottom-[1px] left-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" /></Link>
+          <Link href="/category/lifestyle" className="group relative py-1 transition-colors hover:text-brand">Lifestyle<span className="absolute -bottom-[1px] left-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" /></Link>
+          <Link href="/about" className="group relative py-1 transition-colors hover:text-brand">About us<span className="absolute -bottom-[1px] left-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" /></Link>
+          <Link href="/delivery" className="group relative py-1 transition-colors hover:text-brand">Delivery<span className="absolute -bottom-[1px] left-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" /></Link>
+          <a href="/#offers" className="group relative py-1 transition-colors hover:text-brand">Special offers<span className="absolute -bottom-[1px] left-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" /></a>
+          <Link href="/contact" className="group relative py-1 transition-colors hover:text-brand">Contact<span className="absolute -bottom-[1px] left-0 h-0.5 w-0 bg-brand transition-all duration-300 group-hover:w-full" /></Link>
         </div>
       </nav>
     </header>

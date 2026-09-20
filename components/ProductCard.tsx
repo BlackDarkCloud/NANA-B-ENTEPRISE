@@ -3,6 +3,7 @@ import Image from "next/image";
 import { formatGHS } from "@/lib/money";
 import QuickAddButton from "./QuickAddButton";
 import WishlistButton from "./WishlistButton";
+import ProductImageZoom from "./ProductImageZoom";
 
 type Props = {
   product: {
@@ -23,16 +24,18 @@ export default function ProductCard({ product }: Props) {
     : null;
 
   return (
-    <article className="group min-w-0 rounded-2xl bg-white p-2 transition duration-300 hover:shadow-card">
+    <article className="group min-w-0 rounded-2xl bg-white p-2 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card">
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-square overflow-hidden rounded-xl bg-[#F4F5F7]">
-          {discount && <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-brand-red px-2 py-1.5 text-[10px] font-bold text-white sm:left-3 sm:top-3">{discount}% off</span>}
+          {discount && <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-brand-red px-2 py-1.5 text-[10px] font-bold text-white shadow-sm sm:left-3 sm:top-3">{discount}% off</span>}
           <WishlistButton productId={product.id} />
-          {product.images[0] && <Image src={product.images[0]} alt={product.name} fill unoptimized={product.images[0].startsWith("data:")} className="object-cover transition duration-500 group-hover:scale-105" />}
+          {product.images[0] && <Image src={product.images[0]} alt={product.name} fill unoptimized={product.images[0].startsWith("data:")} className="object-cover transition-transform duration-500 ease-out group-hover:scale-110" />}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          {product.images.length > 0 && <ProductImageZoom images={product.images} alt={product.name} />}
         </div>
         <div className="py-3">
           {product.category?.name && <p className="truncate text-[9px] font-bold uppercase tracking-wide text-slate-400 sm:text-[10px]">{product.category.name}</p>}
-          <h3 className="mt-1 line-clamp-2 min-h-10 text-xs font-semibold leading-5 text-slate-800 sm:text-sm">{product.name}</h3>
+          <h3 className="mt-1 line-clamp-2 min-h-10 text-xs font-semibold leading-5 text-slate-800 transition-colors group-hover:text-brand-dark sm:text-sm">{product.name}</h3>
           {product.compareAtPrice && <p className="mt-2 text-[11px] text-slate-400 line-through">{formatGHS(product.compareAtPrice)}</p>}
           <p className="text-base font-black text-brand-red sm:text-lg">{formatGHS(product.price)}</p>
         </div>

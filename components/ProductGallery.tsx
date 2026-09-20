@@ -2,12 +2,15 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import ImageLightbox from "./ImageLightbox";
 
 export default function ProductGallery({ images, name }: { images: string[]; name: string }) {
   const gallery = images.filter(Boolean);
   const [active, setActive] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef(0);
+  const wasSwipe = useRef(false);
 
   if (gallery.length === 0) {
     return <div className="relative aspect-square overflow-hidden rounded-3xl bg-[#EFF2F6] sm:aspect-[4/3]" />;
@@ -29,10 +32,15 @@ export default function ProductGallery({ images, name }: { images: string[]; nam
 
   function onTouchEnd() {
     const threshold = 40;
-    if (touchDeltaX.current > threshold) go(active - 1);
-    else if (touchDeltaX.current < -threshold) go(active + 1);
+    if (touchDeltaX.current > threshold) { go(active - 1); wasSwipe.current = true; }
+    else if (touchDeltaX.current < -threshold) { go(active + 1); wasSwipe.current = true; }
     touchStartX.current = null;
     touchDeltaX.current = 0;
+  }
+
+  function openLightbox() {
+    if (wasSwipe.current) { wasSwipe.current = false; return; }
+    setLightboxOpen(true);
   }
 
   return (
@@ -43,6 +51,12 @@ export default function ProductGallery({ images, name }: { images: string[]; nam
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
+        <button
+          type="button"
+          aria-label={`View ${name} full-screen`}
+          onClick={openLightbox}
+          className="absolute inset-0 z-10 cursor-zoom-in"
+        />
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${active * 100}%)` }}
@@ -55,11 +69,16 @@ export default function ProductGallery({ images, name }: { images: string[]; nam
                 fill
                 priority={index === 0}
                 unoptimized={image.startsWith("data:")}
-                className="object-cover"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
             </div>
           ))}
         </div>
+
+        <span className="pointer-events-none absolute bottom-3 right-3 z-20 hidden items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-[11px] font-bold text-white opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100 sm:flex">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /><path d="M11 8v6M8 11h6" /></svg>
+          Tap to zoom
+        </span>
 
         {gallery.length > 1 && (
           <>
@@ -105,12 +124,16 @@ export default function ProductGallery({ images, name }: { images: string[]; nam
               type="button"
               onClick={() => go(index)}
               aria-label={`Show photo ${index + 1}`}
-              className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#EFF2F6] ring-2 transition ${index === active ? "ring-brand" : "ring-transparent hover:ring-slate-200"}`}
+              className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#EFF2F6] ring-2 transition-all duration-200 hover:scale-105 ${index === active ? "ring-brand" : "ring-transparent hover:ring-slate-300"}`}
             >
               <Image src={image} alt="" fill unoptimized={image.startsWith("data:")} className="object-cover" />
             </button>
           ))}
         </div>
+      )}
+
+      {lightboxOpen && (
+        <ImageLightbox images={gallery} alt={name} initialIndex={active} onClose={() => setLightboxOpen(false)} />
       )}
     </div>
   );

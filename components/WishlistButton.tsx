@@ -30,7 +30,7 @@ export default function WishlistButton({ productId }: { productId: string }) {
   }
 
   return (
-    <button type="button" onClick={toggle} disabled={loading} aria-label={saved ? "Remove from wishlist" : "Add to wishlist"} className={`absolute right-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-lg shadow-sm ${saved ? "text-brand-red" : "text-slate-600"}`}>
+    <button type="button" onClick={toggle} disabled={loading} aria-label={saved ? "Remove from wishlist" : "Add to wishlist"} className={`absolute right-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-lg shadow-sm transition-all duration-200 hover:scale-110 active:scale-90 ${saved ? "text-brand-red animate-scale-in" : "text-slate-600"}`}>
       {saved ? "♥" : "♡"}
     </button>
   );

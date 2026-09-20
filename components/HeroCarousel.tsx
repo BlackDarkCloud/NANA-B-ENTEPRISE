@@ -81,7 +81,7 @@ export default function HeroCarousel({
           <img
             src={slide.image}
             alt={slide.name}
-            className={`h-full w-full ${slide.product ? "object-cover" : "object-contain"}`}
+            className={`h-full w-full transition-transform duration-[5000ms] ease-out ${slide.product ? "object-cover" : "object-contain"} ${index === active ? "scale-110" : "scale-100"}`}
           />
           {slide.product && (
             <>

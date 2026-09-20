@@ -14,6 +14,26 @@ html {
   @apply bg-brand text-white;
 }
 
+/* Reveal-on-scroll: elements start hidden/offset and are flipped to visible by the
+   Reveal component (IntersectionObserver) adding the .is-visible class. Respect
+   users who've asked for reduced motion by skipping the animation entirely. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+}
+[data-reveal].is-visible {
+  animation: fadeInUp .7s cubic-bezier(.16,1,.3,1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transform: none; animation: none !important; }
+  * { scroll-behavior: auto !important; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @layer components {
   .site-shell {
     @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8;
@@ -29,16 +49,16 @@ html {
     @apply text-2xl font-black tracking-[-.03em] text-brand-dark sm:text-3xl;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-b from-brand to-brand-dark px-6 py-3 text-sm font-bold text-white shadow-lift transition duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0;
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-b from-brand to-brand-dark px-6 py-3 text-sm font-bold text-white shadow-lift transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:brightness-110 active:translate-y-0 active:scale-95;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-brand-dark shadow-soft transition duration-200 hover:-translate-y-0.5 hover:border-brand hover:text-brand;
+    @apply inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-brand-dark shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand hover:text-brand hover:shadow-card active:scale-95;
   }
   .category-card {
-    @apply rounded-2xl border border-slate-200 bg-white p-5 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-card;
+    @apply group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand/30 hover:shadow-card active:scale-[.98];
   }
   .form-input {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-4 focus:ring-brand/10;
+    @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-brand focus:ring-4 focus:ring-brand/10;
   }
   .panel {
     @apply rounded-2xl border border-slate-200 bg-white shadow-soft;
