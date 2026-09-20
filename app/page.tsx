@@ -89,7 +89,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {categories.map((category, index) => (
             <Reveal key={category.id} delay={index * 70}>
-              <Link href={`/category/${category.slug}`} className="category-card">
+              <Link href={`/category/${category.slug}`} className="category-card group">
                 <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-sm font-black text-brand transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">{String(index + 1).padStart(2, "0")}</span>
                 <strong className="block text-sm text-brand-dark transition-colors group-hover:text-brand sm:text-base">{category.name}</strong>
                 <small className="mt-1 flex items-center gap-1 text-slate-500">Browse collection <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span></small>
